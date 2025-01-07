@@ -6,6 +6,8 @@ import {
   GraphQLString,
 } from "graphql";
 import { AUTHORS, BOOKS } from "./mockData";
+import Author from "../storage/models/author";
+import Book from "../storage/models/book";
 
 const BookType: GraphQLObjectType = new GraphQLObjectType({
   name: "Book",
@@ -15,8 +17,9 @@ const BookType: GraphQLObjectType = new GraphQLObjectType({
     genre: { type: GraphQLString },
     author: {
       type: AuthorType,
-      resolve(parent, args) {
-        const author = AUTHORS.find((a) => a.id === parent.authorID);
+      async resolve(parent, args) {
+        // const author = AUTHORS.find((a) => a.id === parent.authorID);
+        const author = await Author.findById(parent.authorId);
         if (!author) return null;
         return author;
       },
@@ -32,8 +35,9 @@ const AuthorType: GraphQLObjectType = new GraphQLObjectType({
     age: { type: GraphQLInt },
     books: {
       type: new GraphQLList(BookType),
-      resolve(parent, args) {
-        const books = BOOKS.filter((b) => b.authorID === parent.id);
+      async resolve(parent, args) {
+        // const books = BOOKS.filter((b) => b.authorID === parent.id);
+        const books = await Book.find({ authorId: parent.id });
         return books;
       },
     },
